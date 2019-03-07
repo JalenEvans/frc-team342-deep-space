@@ -8,37 +8,44 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
+import frc.robot.OI;
 import frc.robot.Robot;
-import frc.robot.subsystems.FistSystem;
 
-public class FistRelease extends Command {
-
-  private FistSystem fist;
-
-  public FistRelease() {
-    requires(Robot.m_subsystem);
-    fist = FistSystem.getInstance();
+/**
+ * An example command.  You can replace me with your own command.
+ */
+public class XboxRumble extends Command {
+  private OI oi;
+  public XboxRumble() {
+    // Use requires() here to declare subsystem dependencies
   }
 
+  // Called just before this Command runs the first time
   @Override
   protected void initialize() {
+    oi = OI.getInstance();
   }
 
+  // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    fist.despense();
+     // oi.setDriveRumble(1.0);
   }
 
+  // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
     return false;
   }
 
+  // Called once after isFinished returns true
   @Override
   protected void end() {
-    fist.stop();
+   //oi.setDriveRumble(0.0);
   }
 
+  // Called when another command which requires one or more of the same
+  // subsystems is scheduled to run
   @Override
   protected void interrupted() {
     end();

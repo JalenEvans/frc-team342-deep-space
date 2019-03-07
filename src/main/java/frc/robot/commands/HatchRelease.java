@@ -8,31 +8,24 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.robot.subsystems.Knuckles;
 import frc.robot.Robot;
-import frc.robot.RobotMap;
 import frc.robot.subsystems.LiftSystem;
-import frc.robot.OI;
 
+/**
+ * An example command. You can replace me with your own command.
+ */
+public class HatchRelease extends Command {
 
-
-public class LiftWithJoystick extends Command {
-
+  private Knuckles Cylinder = Knuckles.getInstance();
   private LiftSystem lift;
-  private OI oi;
 
-  private static final double DEADZONE = 0.1;
-  private static final double ZERO = 0.0;
-
-  private double RightJoystickValue;
-
- 
-
-  public LiftWithJoystick() {
-    System.out.println("In Lift With Joystick Constructor");
+  public HatchRelease() {
     
-    oi = OI.getInstance();
+    System.out.println("In HatchRelease Constructor");
     lift = LiftSystem.getInstance();
+
   }
 
   // Called just before this Command runs the first time
@@ -43,47 +36,34 @@ public class LiftWithJoystick extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    //TODO make piston activated by a button
-
-   
-   RightJoystickValue = oi.getJoystickManipulatorRightYAxis() * -1.0;
-    //System.out.println("Is Lifting " + lift.getIsLifting());
-
-        
-
-      if (RightJoystickValue > DEADZONE ){
+      System.out.println("Hatch being released");
+  
+        Cylinder.pneumaticIn();
+        Cylinder.setIsOpening(true);
       
-        lift.liftUp(Math.abs(RightJoystickValue)*.3);
-        
-        // System.out.println("encoder: " + lift.getLiftEncoders());
       
-      } else if (RightJoystickValue < DEADZONE * -1){
-     
-      lift.liftDown(Math.abs(RightJoystickValue)*.3);
-    
-      //System.out.println("encoder: " + lift.getLiftEncoders());
-      } else if(!lift.getIsLifting()){
-
-      lift.liftStop(); 
-      }
-    
     }
-    
   
 
+  // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
-    return false;
+    return true;
   }
 
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    lift.liftStop();
+    Cylinder.setIsOpening(false);
+    lift.setHatchMode(false);
+    System.out.println("not in Hatch Mode");
   }
 
+  // Called when another command which requires one or more of the same
+  // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    end(); 
+    
+    end();
   }
 }

@@ -8,31 +8,42 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.subsystems.LiftSystem;
+import com.ctre.phoenix.sensors.PigeonIMU;
 import frc.robot.OI;
 
-
-
-public class LiftWithJoystick extends Command {
-
+/**
+ * An example command.  You can replace me with your own command.
+ */
+public class WristToPosition extends Command {
+  
   private LiftSystem lift;
-  private OI oi;
-
-  private static final double DEADZONE = 0.1;
-  private static final double ZERO = 0.0;
-
-  private double RightJoystickValue;
+  private Double CurrentAngle;
+  private Double Goal;
+  private Double Speed;
+  private Double BufferZone = 20.0;
+  
 
  
 
-  public LiftWithJoystick() {
-    System.out.println("In Lift With Joystick Constructor");
-    
-    oi = OI.getInstance();
+  public enum WristPosition {
+ 
+    Hatch(180.0), Cargo(90.0);
+    public final Double value;
+
+	  WristPosition(Double InitValue) {
+        this.value = InitValue;
+    }
+
+  }
+  
+  
+  public WristToPosition(WristPosition targetAngle) {
     lift = LiftSystem.getInstance();
+    Speed = 0.75;
+    Goal = targetAngle.value;
   }
 
   // Called just before this Command runs the first time
@@ -43,34 +54,24 @@ public class LiftWithJoystick extends Command {
   // Called repeatedly when this Command is scheduled to run
   @Override
   protected void execute() {
-    //TODO make piston activated by a button
 
-   
-   RightJoystickValue = oi.getJoystickManipulatorRightYAxis() * -1.0;
-    //System.out.println("Is Lifting " + lift.getIsLifting());
 
-        
 
-      if (RightJoystickValue > DEADZONE ){
-      
-        lift.liftUp(Math.abs(RightJoystickValue)*.3);
-        
-        // System.out.println("encoder: " + lift.getLiftEncoders());
-      
-      } else if (RightJoystickValue < DEADZONE * -1){
-     
-      lift.liftDown(Math.abs(RightJoystickValue)*.3);
-    
-      //System.out.println("encoder: " + lift.getLiftEncoders());
-      } else if(!lift.getIsLifting()){
+   if (Goal == WristPosition.Cargo.value){
 
-      lift.liftStop(); 
-      }
-    
-    }
-    
-  
+     lift.wristUp(Speed);
 
+   } else if (Goal == WristPosition.Hatch.value){
+
+     lift.wristDown(Speed);
+
+   }else {
+     lift.wristStop();
+   }
+
+  }
+
+  // Make this return true when this Command no longer needs to run execute()
   @Override
   protected boolean isFinished() {
     return false;
@@ -79,11 +80,15 @@ public class LiftWithJoystick extends Command {
   // Called once after isFinished returns true
   @Override
   protected void end() {
-    lift.liftStop();
+    lift.wristStop();
   }
 
+  // Called when another command which requires one or more of the same
+  // subsystems is scheduled to run
   @Override
   protected void interrupted() {
-    end(); 
+    lift.wristStop();
   }
+
+
 }
